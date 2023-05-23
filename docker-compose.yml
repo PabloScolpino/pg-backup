@@ -1,0 +1,29 @@
+---
+version: '3.8'
+
+services:
+  db:
+    image: postgres:${PG_VERSION}
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_USER: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backup:
+    build:
+      context: .
+      args:
+        PG_VERSION:
+    depends_on:
+      - db
+    environment:
+      B2_APPLICATION_KEY:
+      B2_APPLICATION_KEY_ID:
+      B2_BUCKET_NAME:
+      DATABASE_URL: postgresql://postgres:mysecretpassword@db/mydatabase
+      ENCRYPTION_KEY:
+
+volumes:
+  db_data:

@@ -29,3 +29,15 @@ The configuration is done thrugh environment variables
 * `B2_BUCKET_NAME`: Blackblaze's bucket name
 
 * `ENCRYPTION_KEY`: The simetric password to encrypt the dump with
+
+# Development & Testing
+
+    # Configure credentials and target PG version
+    cp .env.sample .env
+    vi .env
+
+    docker compose build
+    docker compose down --remove-orphans -v
+    docker compose up -d db
+    sleep 1
+    docker compose run --rm backup
