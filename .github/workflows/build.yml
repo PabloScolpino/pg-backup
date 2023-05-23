@@ -22,12 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Prepare image version
+      - name: Prepare image tag
         run: |
           # Strip git ref prefix from version
-          version=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          image_tag=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && image_tag=$(echo $version | sed -e 's/^v//')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && image_tag=$(echo $image_tag | sed -e 's/^v//')
           # Use Docker `latest` tag convention
           [ "$image_tag" == "main" ] && image_tag=latest
 
