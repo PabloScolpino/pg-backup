@@ -1,0 +1,87 @@
+---
+name: Build & Publish
+
+on:
+  push:
+    branches:
+      - main
+
+    tags:
+      - v*
+
+  workflow_dispatch:
+
+permissions:
+  packages: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Prepare image version
+        run: |
+          # Strip git ref prefix from version
+          version=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && image_tag=$(echo $version | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$image_tag" == "main" ] && image_tag=latest
+
+          echo "image_tag=${image_tag}"
+          echo "image_tag=${image_tag}" >> $GITHUB_ENV
+          echo "`image_tag=${image_tag}`" >> $GITHUB_STEP_SUMMARY
+
+      # - name: Prepare GHCR's image tag
+      #   env:
+      #     image_tag: ${{ env.image_tag }}
+      #   run: |
+      #     image_respository=ghcr.io/${{ github.repository }}
+      #     # Change all uppercase to lowercase
+      #     image_respository=$(echo $image_respository | tr '[A-Z]' '[a-z]')
+
+      #     echo "ghcr_image_tag=${image_respository}:${image_tag}"
+      #     echo "ghcr_image_tag=${image_respository}:${image_tag}" >> $GITHUB_ENV
+      #     echo "`ghcr_image_tag=${image_respository}:${image_tag}`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Prepare Docker image tag
+        env:
+          image_tag: ${{ env.image_tag }}
+        run: |
+          image_respository=${{ github.repository }}
+          # Change all uppercase to lowercase
+          image_respository=$(echo $image_respository | tr '[A-Z]' '[a-z]')
+
+          echo "docker_image_tag=${image_respository}:${image_tag}"
+          echo "docker_image_tag=${image_respository}:${image_tag}" >> $GITHUB_ENV
+          echo "`docker_image_tag=${image_respository}:${image_tag}`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Docker Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          target: production
+          tags: |
+            ${{ env.docker_image_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
