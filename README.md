@@ -8,9 +8,9 @@ Backup postgresql databases to blackblaze
 
 # How to use it
 
-    docker pull pabloscolpino/pg-to-b2
+    docker pull pabloscolpino/pg-to-b2:13-latest
 
-    docker run pabloscolpino/pg-to-b2 \
+    docker run pabloscolpino/pg-to-b2:13-latest \
         --env DATABASE_URL \
         --env B2_APPLICATION_KEY \
         --env B2_APPLICATION_KEY_ID \
