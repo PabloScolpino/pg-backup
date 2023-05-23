@@ -79,7 +79,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          target: production
           tags: |
             ${{ env.docker_image_tag }}
           cache-from: type=gha
