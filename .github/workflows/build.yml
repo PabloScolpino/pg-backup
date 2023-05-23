@@ -23,8 +23,8 @@ jobs:
       matrix:
         pg_version:
           - 13
-          # - 14
-          # - 15
+          - 14
+          - 15
 
     steps:
       - uses: actions/checkout@v2
@@ -88,8 +88,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
+          build-args: |
+            PG_VERSION=${{ matrix.pg_version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           push: true
           tags: |
             ${{ env.docker_image_tag }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
