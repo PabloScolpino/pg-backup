@@ -19,6 +19,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        pg_version:
+          - 13
+          # - 14
+          # - 15
+
     steps:
       - uses: actions/checkout@v2
 
@@ -30,6 +37,9 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && image_tag=$(echo $image_tag | sed -e 's/^v//')
           # Use Docker `latest` tag convention
           [ "$image_tag" == "main" ] && image_tag=latest
+
+          # Prepend pg_version
+          image_tag=${{ matrix.pg_version }}-${image_tag}
 
           echo "image_tag=${image_tag}"
           echo "image_tag=${image_tag}" >> $GITHUB_ENV
