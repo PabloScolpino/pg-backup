@@ -2,9 +2,9 @@
 
 Backup postgresql databases to blackblaze
 
-* take a pg_dump from the database
-* encript it
-* upload it to blackblaze
+* run pg_dump targetting the given database
+* encript the dump
+* upload the encrypted dump to blackblaze
 
 # How to use it
 
